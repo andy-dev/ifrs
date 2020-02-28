@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { signInWithGoogle } from "./firebase.js";
+import withUser from "./withUser.js";
 
 class SignIn extends Component {
   state = { email: "", password: "" };
@@ -18,6 +19,7 @@ class SignIn extends Component {
 
   render() {
     const { email, password } = this.state;
+    console.log("sign in props", this.props);
 
     return (
       <form className="" onSubmit={this.handleSubmit}>
@@ -43,4 +45,4 @@ class SignIn extends Component {
   }
 }
 
-export default SignIn;
+export default withUser(SignIn);

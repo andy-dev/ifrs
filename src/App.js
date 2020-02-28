@@ -17,6 +17,7 @@ const App = () => {
     return (
       <React.StrictMode>
         <p>We have a user</p>
+        <SignIn></SignIn>
         <button onClick={signOut}>Sign Out User</button>
       </React.StrictMode>
     );

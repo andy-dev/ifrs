@@ -10,3 +10,5 @@
 
 #deploy
 `npm run deploy`
+
+firebase deploy --only functions
