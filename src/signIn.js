@@ -19,7 +19,7 @@ class SignIn extends Component {
 
   render() {
     const { email, password } = this.state;
-    console.log("sign in props", this.props);
+    // console.log("sign in props", this.props);
 
     return (
       <form className="" onSubmit={this.handleSubmit}>

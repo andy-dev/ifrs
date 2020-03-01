@@ -4,10 +4,13 @@ import UserProvider from "./providers/UserProvider";
 import { UserContext } from "./providers/UserProvider";
 
 import { collectIdsandDocs } from "./utilities.js";
-import { signOut } from "./firebase.js";
+import { signOut, firestore } from "./firebase.js";
 
 import SignIn from "./signIn.js";
 import SignUp from "./signUp.js";
+
+// Containers
+import UserRoutingContainer from "./user/containers/user-routing-container.js";
 
 const App = () => {
   const user = useContext(UserContext);
@@ -16,9 +19,7 @@ const App = () => {
     console.log(user);
     return (
       <React.StrictMode>
-        <p>We have a user</p>
-        <SignIn></SignIn>
-        <button onClick={signOut}>Sign Out User</button>
+        <UserRoutingContainer user={user} />
       </React.StrictMode>
     );
   } else if (user === "admin") {
