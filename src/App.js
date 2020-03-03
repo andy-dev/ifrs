@@ -16,7 +16,6 @@ const App = () => {
   const user = useContext(UserContext);
 
   if (user !== null) {
-    console.log(user);
     return (
       <React.StrictMode>
         <UserRoutingContainer user={user} />

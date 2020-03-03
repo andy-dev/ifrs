@@ -48,9 +48,23 @@ class FormContainer extends Component {
       <>
         <h1>Form</h1>
         <Link to="/">Dashboard</Link>
-        <pre>
+        {/* <RenderFormQuestions form={form} /> */}
+
+        {form !== null && <h2>not null</h2>}
+
+        {form !== null &&
+          form.form.map(q => {
+            return (
+              <ul>
+                <li>{q.question}</li>
+                <li>{q.userResponse}</li>
+                <li>{q.rank}</li>
+              </ul>
+            );
+          })}
+        {/* <pre>
           <code>{JSON.stringify(form, null, 4)}</code>
-        </pre>
+        </pre> */}
       </>
     );
   }

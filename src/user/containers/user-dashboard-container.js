@@ -7,7 +7,8 @@ import { collectIdsandDocs } from "../../utilities.js";
 
 class UserDashBoardContainer extends Component {
   state = {
-    userForms: null
+    userForms: null,
+    basicFormTemplate: null
   };
 
   get userFormsRef() {
@@ -17,25 +18,39 @@ class UserDashBoardContainer extends Component {
       .collection("forms");
   }
 
+  get formTemplatesRef() {
+    return firestore.collection("templates").where("formName", "==", "Basica");
+  }
+
   componentDidMount = () => {
     this.getUserForms();
+    this.getBasicFormTemplate();
   };
 
   unsubscribeUserForms = null;
+  unsubscribeBasicFormTemplates = null;
 
   getUserForms = () => {
     this.unsubscribeUseForms = this.userFormsRef.onSnapshot(snapshot => {
       const userForms = snapshot.docs.map(collectIdsandDocs);
+      console.log(userForms);
       this.setState({ userForms });
     });
   };
 
-  addForm = () => {
-    let form = {
-      input1: "",
-      input2: ""
-    };
-    this.userFormsRef.add(form);
+  getBasicFormTemplate = () => {
+    this.unsubscribeBasicFormTemplates = this.formTemplatesRef.onSnapshot(
+      snapshot => {
+        const basicFormTemplate = snapshot.docs.map(collectIdsandDocs)[0];
+        this.setState({ basicFormTemplate });
+      }
+    );
+  };
+
+  addFormToUser = () => {
+    const { basicFormTemplate } = this.state;
+
+    this.userFormsRef.add(basicFormTemplate);
   };
 
   deleteForm = formId => {
@@ -46,11 +61,14 @@ class UserDashBoardContainer extends Component {
     if (typeof this.unsubscribeUserForms === "function") {
       this.unsubscribeClientSymptoms();
     }
+    if (typeof this.unsubscribeBasicFormTemplates === "function") {
+      this.unsubscribeBasicFormTemplates();
+    }
   };
 
   render() {
     const { userForms } = this.state;
-    console.log(userForms);
+
     return (
       <>
         <h1
@@ -66,7 +84,7 @@ class UserDashBoardContainer extends Component {
           User Dashboard
         </h1>
         <button onClick={signOut}>Sign Out</button>
-        <button onClick={this.addForm}>Add Form</button>
+        <button onClick={this.addFormToUser}>Add Form</button>
 
         <div>
           <p>Your Forms</p>
