@@ -32,8 +32,9 @@ class UserDashBoardContainer extends Component {
 
   getUserForms = () => {
     this.unsubscribeUseForms = this.userFormsRef.onSnapshot(snapshot => {
-      const userForms = snapshot.docs.map(collectIdsandDocs);
-      console.log(userForms);
+      const userForms = snapshot.docs.map(doc => {
+        return { docId: doc.id, ...doc.data() };
+      });
       this.setState({ userForms });
     });
   };
@@ -89,18 +90,18 @@ class UserDashBoardContainer extends Component {
         <div>
           <p>Your Forms</p>
           {userForms !== null &&
-            userForms.map(form => {
+            userForms.map((form, i) => {
               return (
-                <div key={form.id}>
-                  <p>form id: {form.id}</p>
+                <div key={i}>
+                  <p>form doc id: {form.docId}</p>
                   <button
                     onClick={() => {
-                      navigate(`form/${form.id}`);
+                      navigate(`form/${form.docId}`);
                     }}
                   >
                     Edit
                   </button>
-                  <button onClick={() => this.deleteForm(form.id)}>
+                  <button onClick={() => this.deleteForm(form.docId)}>
                     Delete
                   </button>
                 </div>

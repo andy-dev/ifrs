@@ -24,7 +24,9 @@ class FormContainer extends Component {
     this.unsubscribeFromForm = this.userFormsRef
       .doc(docId)
       .onSnapshot(snapshot => {
+        console.log(snapshot);
         const form = { ...snapshot.data(), id: docId };
+        console.log("form", form);
         this.setState({ form });
       });
   };
@@ -50,12 +52,10 @@ class FormContainer extends Component {
         <Link to="/">Dashboard</Link>
         {/* <RenderFormQuestions form={form} /> */}
 
-        {form !== null && <h2>not null</h2>}
-
         {form !== null &&
           form.form.map(q => {
             return (
-              <ul>
+              <ul key={q.rank}>
                 <li>{q.question}</li>
                 <li>{q.userResponse}</li>
                 <li>{q.rank}</li>
