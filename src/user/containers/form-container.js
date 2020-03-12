@@ -52,13 +52,38 @@ class FormContainer extends Component {
     }
   };
 
-  handleChange = event => {
+  handleTextChange = event => {
     // name ~ rank
     const { name, value } = event.target;
     const { userResponses } = this.state;
 
     userResponses[parseInt(name, 10)] = value;
     this.setState({ userResponses });
+  };
+
+  handleNumberChange = event => {
+    const { name, value } = event.target;
+    const { userResponses } = this.state;
+    userResponses[parseInt(name, 10)] = parseInt(value, 10);
+    this.setState({ userResponses });
+  };
+
+  handleDateChange = event => {
+    const { name, value } = event.target;
+    const data = event.target.dataset.date;
+
+    const { userResponses } = this.state;
+
+    debugger;
+    console.log(userResponses[parseInt(name, 10)]);
+    console.log(name, value, data);
+  };
+
+  handleBooleanChange = event => {
+    const { name, value } = event.target;
+    const { userResponses } = this.state;
+    // userResponses[parseInt(name, 10)] = parseInt(value, 10);
+    // this.setState({ userResponses });
   };
 
   saveToDB = () => {
@@ -88,7 +113,7 @@ class FormContainer extends Component {
                     rows="5"
                     cols="33"
                     value={userResponses[q.rank]}
-                    onChange={this.handleChange}
+                    onChange={this.handleTextChange}
                     onBlur={this.saveToDB}
                   ></textarea>
                 </div>
@@ -98,14 +123,40 @@ class FormContainer extends Component {
                 <div key={q.rank}>
                   <p>{q.question}</p>
                   <br />
-                  <Calendar></Calendar>
+
+                  <input
+                    type="text"
+                    data-date="day"
+                    name={q.rank}
+                    placeholder="Día"
+                    onChange={this.handleDateChange}
+                  />
+                  <input
+                    type="text"
+                    data-date="month"
+                    name={q.rank}
+                    placeholder="Mes"
+                    onChange={this.handleDateChange}
+                  />
+                  <input
+                    type="text"
+                    data-date="year"
+                    name={q.rank}
+                    placeholder="Año"
+                    onChange={this.handleDateChange}
+                  />
                 </div>
               );
             } else if (q.inputType === "number") {
               return (
                 <div key={q.rank}>
                   <p>{q.question}</p>
-                  <input type="number" />
+                  <input
+                    name={q.rank}
+                    type="number"
+                    value={userResponses[q.rank]}
+                    onChange={this.handleNumberChange}
+                  />
                 </div>
               );
             } else if (q.inputType === "boolean") {
@@ -113,9 +164,9 @@ class FormContainer extends Component {
                 <div key={q.rank}>
                   <p>{q.question}</p>
                   <label htmlFor="huey">Si</label>
-                  <input type="radio" id="huey" name="drone" value="si" />
+                  <input type="radio" id="huey" name={q.rank} value="si" />
                   <label htmlFor="huey">No</label>
-                  <input type="radio" id="huey" name="drone" value="no" />
+                  <input type="radio" id="huey" name={q.rank} value="no" />
                 </div>
               );
             }
