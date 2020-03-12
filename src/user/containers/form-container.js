@@ -33,11 +33,16 @@ class FormContainer extends Component {
       });
   };
 
-  arrayToObject = array =>
-    array.reduce((obj, item) => {
-      obj[item.rank] = item.userResponse;
-      return obj;
-    }, {});
+  arrayToObject = array => {
+    if (array !== undefined) {
+      return array.reduce((obj, item) => {
+        obj[item.rank] = item.userResponse;
+        return obj;
+      }, {});
+    } else {
+      return {};
+    }
+  };
 
   componentDidUpdate() {
     const { form } = this.state;
@@ -70,11 +75,9 @@ class FormContainer extends Component {
 
   handleDateChange = event => {
     const { name, value } = event.target;
+    const { userResponses } = this.state;
     const data = event.target.dataset.date;
 
-    const { userResponses } = this.state;
-
-    console.log(userResponses[parseInt(name, 10)][data]);
     userResponses[parseInt(name, 10)][data] = parseInt(value, 10);
     this.setState({ userResponses });
   };
