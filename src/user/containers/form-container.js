@@ -69,6 +69,7 @@ class FormContainer extends Component {
   handleNumberChange = event => {
     const { name, value } = event.target;
     const { userResponses } = this.state;
+
     userResponses[parseInt(name, 10)] = parseInt(value, 10);
     this.setState({ userResponses });
   };
@@ -87,6 +88,14 @@ class FormContainer extends Component {
     const { userResponses } = this.state;
 
     userResponses[parseInt(name, 10)] = value === "true" ? true : false;
+    this.setState({ userResponses });
+  };
+
+  handleSelectionChange = event => {
+    const { name, value } = event.target;
+    const { userResponses } = this.state;
+
+    userResponses[parseInt(name, 10)] = value;
     this.setState({ userResponses });
   };
 
@@ -188,6 +197,27 @@ class FormContainer extends Component {
                     onChange={this.handleBooleanChange}
                     checked={userResponses[q.rank] === false}
                   />
+                </div>
+              );
+            } else if (q.inputType === "selection") {
+              return (
+                <div key={q.rank}>
+                  <label htmlFor="selection">{q.question}</label>
+
+                  <select
+                    id="selection"
+                    name={q.rank}
+                    value={userResponses[q.rank]}
+                    onChange={this.handleSelectionChange}
+                  >
+                    {q.options.map((opt, i) => {
+                      return (
+                        <option key={i} value={opt.option}>
+                          {opt.option}
+                        </option>
+                      );
+                    })}
+                  </select>
                 </div>
               );
             }
