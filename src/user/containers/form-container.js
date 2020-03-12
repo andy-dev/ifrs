@@ -74,16 +74,17 @@ class FormContainer extends Component {
 
     const { userResponses } = this.state;
 
-    debugger;
-    console.log(userResponses[parseInt(name, 10)]);
-    console.log(name, value, data);
+    console.log(userResponses[parseInt(name, 10)][data]);
+    userResponses[parseInt(name, 10)][data] = parseInt(value, 10);
+    this.setState({ userResponses });
   };
 
   handleBooleanChange = event => {
     const { name, value } = event.target;
     const { userResponses } = this.state;
-    // userResponses[parseInt(name, 10)] = parseInt(value, 10);
-    // this.setState({ userResponses });
+
+    userResponses[parseInt(name, 10)] = value === "true" ? true : false;
+    this.setState({ userResponses });
   };
 
   saveToDB = () => {
@@ -128,6 +129,7 @@ class FormContainer extends Component {
                     type="text"
                     data-date="day"
                     name={q.rank}
+                    value={userResponses[q.rank].day}
                     placeholder="Día"
                     onChange={this.handleDateChange}
                   />
@@ -135,6 +137,7 @@ class FormContainer extends Component {
                     type="text"
                     data-date="month"
                     name={q.rank}
+                    value={userResponses[q.rank].month}
                     placeholder="Mes"
                     onChange={this.handleDateChange}
                   />
@@ -143,6 +146,7 @@ class FormContainer extends Component {
                     data-date="year"
                     name={q.rank}
                     placeholder="Año"
+                    value={userResponses[q.rank].year}
                     onChange={this.handleDateChange}
                   />
                 </div>
@@ -163,10 +167,24 @@ class FormContainer extends Component {
               return (
                 <div key={q.rank}>
                   <p>{q.question}</p>
-                  <label htmlFor="huey">Si</label>
-                  <input type="radio" id="huey" name={q.rank} value="si" />
-                  <label htmlFor="huey">No</label>
-                  <input type="radio" id="huey" name={q.rank} value="no" />
+                  <label htmlFor="si">Si</label>
+                  <input
+                    type="radio"
+                    id="si"
+                    name={q.rank}
+                    value={true}
+                    onChange={this.handleBooleanChange}
+                    checked={userResponses[q.rank] === true}
+                  />
+                  <label htmlFor="no">No</label>
+                  <input
+                    type="radio"
+                    id="no"
+                    name={q.rank}
+                    value={false}
+                    onChange={this.handleBooleanChange}
+                    checked={userResponses[q.rank] === false}
+                  />
                 </div>
               );
             }
