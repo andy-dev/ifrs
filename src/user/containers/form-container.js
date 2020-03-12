@@ -61,6 +61,12 @@ class FormContainer extends Component {
     this.setState({ userResponses });
   };
 
+  saveToDB = () => {
+    const { name, value } = event.target;
+    // ojo, esto va hacer un save cada blur
+    console.log("name:", name, "value:", value, "Saving To DB");
+  };
+
   render() {
     const { form, userResponses } = this.state;
     return (
@@ -83,6 +89,7 @@ class FormContainer extends Component {
                     cols="33"
                     value={userResponses[q.rank]}
                     onChange={this.handleChange}
+                    onBlur={this.saveToDB}
                   ></textarea>
                 </div>
               );
