@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Router, Link, navigate } from "@reach/router";
 import { firestore } from "../../firebase";
-import Calendar from "./components/calendar.js";
 
 class FormContainer extends Component {
   state = {
@@ -23,14 +22,17 @@ class FormContainer extends Component {
   }
 
   getForm = async docId => {
-    this.unsubscribeFromForm = this.userFormsRef
-      .doc(docId)
-      .onSnapshot(snapshot => {
-        const form = { ...snapshot.data(), id: docId };
+    let templateForm = await this.userFormsRef.doc(docId).get();
 
-        const userResponses = this.arrayToObject(form.form);
-        this.setState({ form, userResponses });
-      });
+    const form = { ...templateForm.data(), id: docId };
+    let userResponses;
+    if (form.form.length) {
+      userResponses = this.arrayToObject(form.form);
+    } else {
+      userResponses = form.form;
+    }
+
+    this.setState({ form, userResponses });
   };
 
   arrayToObject = array => {
@@ -99,10 +101,37 @@ class FormContainer extends Component {
     this.setState({ userResponses });
   };
 
-  saveToDB = () => {
+  onBlurText = () => {
     const { name, value } = event.target;
     // ojo, esto va hacer un save cada blur
-    console.log("name:", name, "value:", value, "Saving To DB");
+    // console.log("name:", name, "value:", value, "Saving To DB");
+    // this.saveFormToDb(name, value)
+  };
+
+  saveFormToDb = async () => {
+    let updateFormWithUserResponses = this.mergeResponsesWithForm();
+
+    console.log(updateFormWithUserResponses);
+
+    try {
+      await this.userFormsRef.doc(this.props.id).update({
+        form: {
+          0: { userResponse: "fuck" }
+        }
+      });
+    } catch (err) {
+      console.error("Error Saving Form", err);
+    }
+  };
+
+  mergeResponsesWithForm = () => {
+    const { form, userResponses } = this.state;
+    let updatedForm = form.form.map(q => {
+      let userResponse = userResponses[q.rank];
+      return { ...q, userResponse };
+    });
+
+    return { ...form, form: updatedForm };
   };
 
   render() {
@@ -111,6 +140,8 @@ class FormContainer extends Component {
       <>
         <h1>Form</h1>
         <Link to="/">Dashboard</Link>
+        <br />
+        <button onClick={this.saveFormToDb}>Save Form</button>
         {/* <RenderFormQuestions form={form} /> */}
 
         {form !== null &&
@@ -127,7 +158,7 @@ class FormContainer extends Component {
                     cols="33"
                     value={userResponses[q.rank]}
                     onChange={this.handleTextChange}
-                    onBlur={this.saveToDB}
+                    onBlur={this.onBlurText}
                   ></textarea>
                 </div>
               );
@@ -222,6 +253,7 @@ class FormContainer extends Component {
               );
             }
           })}
+        <button onClick={this.saveFormToDb}>Save Form</button>
         {/* <pre>
           <code>{JSON.stringify(form, null, 4)}</code>
         </pre> */}
