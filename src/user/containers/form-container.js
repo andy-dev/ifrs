@@ -117,10 +117,7 @@ class FormContainer extends Component {
             if (q.inputType === "string") {
               return (
                 <div key={i}>
-                  <label htmlFor={q.rank}>
-                    {q.question}
-                    {q.userResponse}
-                  </label>
+                  <label htmlFor={q.rank}>{q.question}</label>
                   <br />
                   <textarea
                     id={q.rank}

@@ -1,11 +1,10 @@
 import React, { useContext } from "react";
 import { render } from "react-dom";
+import { signOut } from "./firebase.js";
 import UserProvider from "./providers/UserProvider";
 import { UserContext } from "./providers/UserProvider";
 
-import { collectIdsandDocs } from "./utilities.js";
-import { signOut, firestore } from "./firebase.js";
-
+// Components
 import SignIn from "./signIn.js";
 import SignUp from "./signUp.js";
 
