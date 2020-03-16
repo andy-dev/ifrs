@@ -19,7 +19,9 @@ class UserDashBoardContainer extends Component {
   }
 
   get formTemplatesRef() {
-    return firestore.collection("templates").where("formName", "==", "Basica");
+    return firestore
+      .collection("formTemplates")
+      .where("formName", "==", "Basica");
   }
 
   componentDidMount = () => {
@@ -31,7 +33,7 @@ class UserDashBoardContainer extends Component {
   unsubscribeBasicFormTemplates = null;
 
   getUserForms = () => {
-    this.unsubscribeUseForms = this.userFormsRef.onSnapshot(snapshot => {
+    this.unsubscribeUserForms = this.userFormsRef.onSnapshot(snapshot => {
       const userForms = snapshot.docs.map(doc => {
         return { docId: doc.id, ...doc.data() };
       });
@@ -60,7 +62,7 @@ class UserDashBoardContainer extends Component {
 
   componentWillUnmount = () => {
     if (typeof this.unsubscribeUserForms === "function") {
-      this.unsubscribeClientSymptoms();
+      this.unsubscribeUserForms();
     }
     if (typeof this.unsubscribeBasicFormTemplates === "function") {
       this.unsubscribeBasicFormTemplates();

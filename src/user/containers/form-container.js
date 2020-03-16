@@ -4,8 +4,7 @@ import { firestore } from "../../firebase";
 
 class FormContainer extends Component {
   state = {
-    form: null,
-    userResponses: null
+    form: null
   };
 
   unsubscribeFromForm = null;
@@ -21,29 +20,13 @@ class FormContainer extends Component {
     this.getForm(this.props.id);
   }
 
-  getForm = async docId => {
-    let templateForm = await this.userFormsRef.doc(docId).get();
-
-    const form = { ...templateForm.data(), id: docId };
-    let userResponses;
-    if (form.form.length) {
-      userResponses = this.arrayToObject(form.form);
-    } else {
-      userResponses = form.form;
-    }
-
-    this.setState({ form, userResponses });
-  };
-
-  arrayToObject = array => {
-    if (array !== undefined) {
-      return array.reduce((obj, item) => {
-        obj[item.rank] = item.userResponse;
-        return obj;
-      }, {});
-    } else {
-      return {};
-    }
+  getForm = docId => {
+    this.unsubscribeFromForm = this.userFormsRef
+      .doc(docId)
+      .onSnapshot(snapshot => {
+        const form = { ...snapshot.data(), id: docId };
+        this.setState({ form });
+      });
   };
 
   componentDidUpdate() {
@@ -62,10 +45,11 @@ class FormContainer extends Component {
   handleTextChange = event => {
     // name ~ rank
     const { name, value } = event.target;
-    const { userResponses } = this.state;
+    const { form } = this.state;
 
-    userResponses[parseInt(name, 10)] = value;
-    this.setState({ userResponses });
+    form.questions[parseInt(name, 10)].userResponse = value;
+
+    this.setState({ form });
   };
 
   handleNumberChange = event => {
@@ -105,58 +89,45 @@ class FormContainer extends Component {
     const { name, value } = event.target;
     // ojo, esto va hacer un save cada blur
     // console.log("name:", name, "value:", value, "Saving To DB");
-    // this.saveFormToDb(name, value)
   };
 
   saveFormToDb = async () => {
-    let updateFormWithUserResponses = this.mergeResponsesWithForm();
-
-    console.log(updateFormWithUserResponses);
-
+    const { form } = this.state;
     try {
       await this.userFormsRef.doc(this.props.id).update({
-        form: {
-          0: { userResponse: "fuck" }
-        }
+        questions: form.questions
       });
     } catch (err) {
       console.error("Error Saving Form", err);
     }
   };
 
-  mergeResponsesWithForm = () => {
-    const { form, userResponses } = this.state;
-    let updatedForm = form.form.map(q => {
-      let userResponse = userResponses[q.rank];
-      return { ...q, userResponse };
-    });
-
-    return { ...form, form: updatedForm };
-  };
-
   render() {
-    const { form, userResponses } = this.state;
+    const { form } = this.state;
     return (
       <>
         <h1>Form</h1>
         <Link to="/">Dashboard</Link>
         <br />
         <button onClick={this.saveFormToDb}>Save Form</button>
-        {/* <RenderFormQuestions form={form} /> */}
 
         {form !== null &&
-          form.form.map(q => {
+          Object.keys(form.questions).map((key, i) => {
+            let q = form.questions[key];
             if (q.inputType === "string") {
               return (
-                <div key={q.rank}>
-                  <label htmlFor={q.rank}>{q.question}</label>
+                <div key={i}>
+                  <label htmlFor={q.rank}>
+                    {q.question}
+                    {q.userResponse}
+                  </label>
                   <br />
                   <textarea
                     id={q.rank}
                     name={q.rank}
                     rows="5"
                     cols="33"
-                    value={userResponses[q.rank]}
+                    value={q.userResponse}
                     onChange={this.handleTextChange}
                     onBlur={this.onBlurText}
                   ></textarea>
@@ -164,7 +135,7 @@ class FormContainer extends Component {
               );
             } else if (q.inputType === "date") {
               return (
-                <div key={q.rank}>
+                <div key={i}>
                   <p>{q.question}</p>
                   <br />
 
@@ -172,7 +143,7 @@ class FormContainer extends Component {
                     type="text"
                     data-date="day"
                     name={q.rank}
-                    value={userResponses[q.rank].day}
+                    // value={userResponses[q.rank].day}
                     placeholder="Día"
                     onChange={this.handleDateChange}
                   />
@@ -180,7 +151,7 @@ class FormContainer extends Component {
                     type="text"
                     data-date="month"
                     name={q.rank}
-                    value={userResponses[q.rank].month}
+                    // value={userResponses[q.rank].month}
                     placeholder="Mes"
                     onChange={this.handleDateChange}
                   />
@@ -189,26 +160,26 @@ class FormContainer extends Component {
                     data-date="year"
                     name={q.rank}
                     placeholder="Año"
-                    value={userResponses[q.rank].year}
+                    // value={userResponses[q.rank].year}
                     onChange={this.handleDateChange}
                   />
                 </div>
               );
             } else if (q.inputType === "number") {
               return (
-                <div key={q.rank}>
+                <div key={i}>
                   <p>{q.question}</p>
                   <input
                     name={q.rank}
                     type="number"
-                    value={userResponses[q.rank]}
+                    // value={userResponses[q.rank]}
                     onChange={this.handleNumberChange}
                   />
                 </div>
               );
             } else if (q.inputType === "boolean") {
               return (
-                <div key={q.rank}>
+                <div key={i}>
                   <p>{q.question}</p>
                   <label htmlFor="si">Si</label>
                   <input
@@ -217,7 +188,7 @@ class FormContainer extends Component {
                     name={q.rank}
                     value={true}
                     onChange={this.handleBooleanChange}
-                    checked={userResponses[q.rank] === true}
+                    // checked={userResponses[q.rank] === true}
                   />
                   <label htmlFor="no">No</label>
                   <input
@@ -226,19 +197,19 @@ class FormContainer extends Component {
                     name={q.rank}
                     value={false}
                     onChange={this.handleBooleanChange}
-                    checked={userResponses[q.rank] === false}
+                    // checked={userResponses[q.rank] === false}
                   />
                 </div>
               );
             } else if (q.inputType === "selection") {
               return (
-                <div key={q.rank}>
+                <div key={i}>
                   <label htmlFor="selection">{q.question}</label>
 
                   <select
                     id="selection"
                     name={q.rank}
-                    value={userResponses[q.rank]}
+                    // value={userResponses[q.rank]}
                     onChange={this.handleSelectionChange}
                   >
                     {q.options.map((opt, i) => {
@@ -254,12 +225,15 @@ class FormContainer extends Component {
             }
           })}
         <button onClick={this.saveFormToDb}>Save Form</button>
-        {/* <pre>
-          <code>{JSON.stringify(form, null, 4)}</code>
-        </pre> */}
       </>
     );
   }
 }
 
 export default FormContainer;
+
+{
+  /* <pre>
+  <code>{JSON.stringify(form, null, 4)}</code>
+</pre> */
+}
